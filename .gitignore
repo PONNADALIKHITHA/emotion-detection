@@ -2,4 +2,3 @@ __pycache__/
 .venv/
 venv/
 emotion_model/
-baseline_model.joblib
