@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7f2">
+  <title>Feeling Finder</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #18352e;
+      --muted: #65756d;
+      --paper: #f5f7f2;
+      --surface: #ffffff;
+      --line: #dce5dd;
+      --green: #176b52;
+      --coral: #e76f51;
+      --yellow: #e7b94c;
+      --blue: #4c7c9b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image: radial-gradient(#cbd8ce 0.7px, transparent 0.7px);
+      background-size: 20px 20px;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    .page { width: min(100% - 40px, 900px); margin: 0 auto; }
+
+    header {
+      height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand { display: flex; gap: 11px; align-items: center; font-weight: 700; }
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      color: white;
+      background: var(--green);
+      font-family: Georgia, serif;
+      font-size: 19px;
+    }
+    .model-label { color: var(--muted); font-size: 12px; }
+
+    main { padding: 68px 0 80px; }
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    h1 {
+      max-width: 650px;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 54px;
+      font-weight: 500;
+      line-height: 1.06;
+    }
+    .intro { margin: 16px 0 34px; color: var(--muted); font-size: 16px; }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(250px, 0.82fr);
+      gap: 20px;
+      align-items: start;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 12px 30px #18352e0c;
+    }
+    .input-panel { padding: 22px; }
+    label { display: block; margin-bottom: 10px; font-size: 13px; font-weight: 700; }
+    textarea {
+      display: block;
+      width: 100%;
+      min-height: 190px;
+      resize: vertical;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      outline: none;
+      color: var(--ink);
+      background: #fbfcfa;
+      font: inherit;
+      line-height: 1.55;
+    }
+    textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px #176b5218; }
+    .form-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 14px; }
+    #counter { color: var(--muted); font-size: 12px; }
+    button {
+      min-height: 42px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 5px;
+      color: white;
+      background: var(--green);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:hover { background: #10543f; }
+    button:disabled { cursor: wait; opacity: 0.7; }
+
+    .results { min-height: 310px; padding: 22px; }
+    .results h2 { margin: 0 0 20px; font-size: 15px; }
+    .empty-state { display: grid; min-height: 235px; place-items: center; color: var(--muted); text-align: center; }
+    .empty-mark {
+      width: 50px;
+      height: 50px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      color: var(--green);
+      background: #e8f1eb;
+      font-family: Georgia, serif;
+      font-size: 24px;
+    }
+    .empty-state p { max-width: 190px; margin: 0; font-size: 13px; line-height: 1.5; }
+    .top-result { padding: 16px; border-radius: 6px; background: #e8f1eb; }
+    .top-result span { display: block; color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; }
+    .top-result strong { display: block; margin-top: 5px; font-family: Georgia, serif; font-size: 27px; font-weight: 500; text-transform: capitalize; }
+    .top-result em { float: right; color: var(--green); font-family: "Segoe UI", sans-serif; font-size: 14px; font-style: normal; }
+    .score-list { display: grid; gap: 14px; margin-top: 20px; }
+    .score-heading { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px; text-transform: capitalize; }
+    .track { height: 7px; overflow: hidden; border-radius: 5px; background: #edf1ed; }
+    .fill { height: 100%; width: 0; border-radius: inherit; background: var(--coral); transition: width 500ms ease; }
+    .score-row:nth-child(2) .fill { background: var(--green); }
+    .score-row:nth-child(3) .fill { background: var(--blue); }
+    .score-row:nth-child(4) .fill { background: var(--yellow); }
+    .score-row:nth-child(5) .fill { background: #bd6e88; }
+    .error { margin: 14px 0 0; color: #a33f32; font-size: 13px; }
+    [hidden] { display: none !important; }
+
+    @media (max-width: 680px) {
+      .page { width: min(100% - 28px, 520px); }
+      header { height: 66px; }
+      main { padding: 48px 0 56px; }
+      h1 { font-size: 40px; }
+      .workspace { grid-template-columns: 1fr; }
+      .results { min-height: 280px; }
+      .empty-state { min-height: 190px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="brand"><span class="brand-mark" aria-hidden="true">f</span><span>Feeling Finder</span></div>
+      <span class="model-label">DISTILBERT / 6 EMOTIONS</span>
+    </header>
+
+    <main>
+      <p class="eyebrow">Emotion classifier</p>
+      <h1>What feeling is inside the words?</h1>
+      <p class="intro">Paste a thought, a note, or a sentence to see what the model notices.</p>
+
+      <div class="workspace">
+        <form class="panel input-panel" id="emotion-form">
+          <label for="text">Your text</label>
+          <textarea id="text" name="text" maxlength="1000" placeholder="Type or paste something here..." required></textarea>
+          <div class="form-footer">
+            <span id="counter">0 / 1,000</span>
+            <button id="submit" type="submit">Analyze text</button>
+          </div>
+          <p class="error" id="error" role="alert" hidden></p>
+        </form>
+
+        <section class="panel results" aria-live="polite" aria-busy="false">
+          <h2>Reading</h2>
+          <div class="empty-state" id="empty-state">
+            <div>
+              <div class="empty-mark" aria-hidden="true">~</div>
+              <p>Your results will appear here.</p>
+            </div>
+          </div>
+          <div id="result-content" hidden>
+            <div class="top-result">
+              <span>Strongest signal <em id="top-score"></em></span>
+              <strong id="top-label"></strong>
+            </div>
+            <div class="score-list" id="score-list"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const form = document.querySelector("#emotion-form");
+    const input = document.querySelector("#text");
+    const button = document.querySelector("#submit");
+    const counter = document.querySelector("#counter");
+    const error = document.querySelector("#error");
+    const results = document.querySelector(".results");
+
+    input.addEventListener("input", () => {
+      counter.textContent = `${input.value.length.toLocaleString()} / 1,000`;
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      error.hidden = true;
+      button.disabled = true;
+      button.textContent = "Analyzing...";
+      results.setAttribute("aria-busy", "true");
+
+      try {
+        const response = await fetch("/api/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: input.value })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Could not analyze this text.");
+
+        const [top, ...others] = data.scores;
+        document.querySelector("#top-label").textContent = top.label;
+        document.querySelector("#top-score").textContent = `${(top.score * 100).toFixed(1)}%`;
+        document.querySelector("#score-list").replaceChildren(...data.scores.map((item) => {
+          const row = document.createElement("div");
+          row.className = "score-row";
+          const heading = document.createElement("div");
+          heading.className = "score-heading";
+          const label = document.createElement("span");
+          label.textContent = item.label;
+          const value = document.createElement("span");
+          value.textContent = `${(item.score * 100).toFixed(1)}%`;
+          heading.append(label, value);
+          const track = document.createElement("div");
+          track.className = "track";
+          const fill = document.createElement("div");
+          fill.className = "fill";
+          fill.style.width = `${item.score * 100}%`;
+          track.append(fill);
+          row.append(heading, track);
+          return row;
+        }));
+        document.querySelector("#empty-state").hidden = true;
+        document.querySelector("#result-content").hidden = false;
+      } catch (exception) {
+        error.textContent = exception.message;
+        error.hidden = false;
+      } finally {
+        button.disabled = false;
+        button.textContent = "Analyze text";
+        results.setAttribute("aria-busy", "false");
+      }
+    });
+  </script>
+</body>
+</html>
